@@ -32,11 +32,14 @@ class AnyCodableTests: XCTestCase {
                 "b": "bravo",
                 "c": "charlie"
             },
-            "null": null
+            "null": null,
+            "date": "2023-12-17T04:56:02Z"
         }
         """.data(using: .utf8)!
 
         let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
         let dictionary = try decoder.decode([String: AnyCodable].self, from: json)
 
         XCTAssertEqual(dictionary["boolean"]?.value as! Bool, true)
@@ -46,6 +49,7 @@ class AnyCodableTests: XCTestCase {
         XCTAssertEqual(dictionary["array"]?.value as! [Int], [1, 2, 3])
         XCTAssertEqual(dictionary["nested"]?.value as! [String: String], ["a": "alpha", "b": "bravo", "c": "charlie"])
         XCTAssertEqual(dictionary["null"]?.value as! NSNull, NSNull())
+		XCTAssertEqual(dictionary["date"]?.value as! Date, Date(timeIntervalSince1970: 1702788962))
     }
 
     func testJSONDecodingEquatable() throws {
@@ -61,7 +65,8 @@ class AnyCodableTests: XCTestCase {
                 "b": "bravo",
                 "c": "charlie"
             },
-            "null": null
+            "null": null,
+            "date": "2023-12-17T04:56:02Z"
         }
         """.data(using: .utf8)!
         
@@ -76,11 +81,13 @@ class AnyCodableTests: XCTestCase {
         XCTAssertEqual(dictionary1["array"], dictionary2["array"])
         XCTAssertEqual(dictionary1["nested"], dictionary2["nested"])
         XCTAssertEqual(dictionary1["null"], dictionary2["null"])
+        XCTAssertEqual(dictionary1["date"], dictionary2["date"])
     }
 
     func testJSONEncoding() throws {
         
         let someCodable = AnyCodable(SomeCodable(string: "String", int: 100, bool: true, hasUnderscore: "another string"))
+        let date = AnyCodable(Date(timeIntervalSince1970: 1702788962))
 
         let injectedValue = 1234
         let dictionary: [String: AnyCodable] = [
@@ -96,10 +103,12 @@ class AnyCodableTests: XCTestCase {
                 "c": "charlie",
             ],
             "someCodable": someCodable,
-            "null": nil
+            "null": nil,
+            "date": date
         ]
 
         let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
 
         let json = try encoder.encode(dictionary)
         let encodedJSONObject = try JSONSerialization.jsonObject(with: json, options: []) as! NSDictionary
@@ -123,7 +132,8 @@ class AnyCodableTests: XCTestCase {
                 "bool": true,
                 "has_underscore":"another string"
             },
-            "null": null
+            "null": null,
+            "date": "2023-12-17T04:56:02Z"
         }
         """.data(using: .utf8)!
         let expectedJSONObject = try JSONSerialization.jsonObject(with: expected, options: []) as! NSDictionary

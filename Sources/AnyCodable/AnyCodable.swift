@@ -65,6 +65,10 @@ extension AnyCodable: Equatable {
             return NSArray(array: lhs) == NSArray(array: rhs)
         case is (NSNull, NSNull):
             return true
+		#if canImport(Foundation)
+		case let (lhs as Date, rhs as Date):
+			return lhs == rhs
+		#endif
         default:
             return false
         }
@@ -140,6 +144,10 @@ extension AnyCodable: Hashable {
             hasher.combine(value)
         case let value as [AnyCodable]:
             hasher.combine(value)
+		#if canImport(Foundation)
+		case let value as Date:
+			hasher.combine(value)
+		#endif
         default:
             break
         }

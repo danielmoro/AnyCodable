@@ -20,6 +20,7 @@ class AnyDecodableTests: XCTestCase {
         """.data(using: .utf8)!
 
         let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
         let dictionary = try decoder.decode([String: AnyDecodable].self, from: json)
 
         XCTAssertEqual(dictionary["boolean"]?.value as! Bool, true)
@@ -30,4 +31,19 @@ class AnyDecodableTests: XCTestCase {
         XCTAssertEqual(dictionary["nested"]?.value as! [String: String], ["a": "alpha", "b": "bravo", "c": "charlie"])
         XCTAssertEqual(dictionary["null"]?.value as! NSNull, NSNull())
     }
+
+	func testJSONISODateDecoding() throws {
+		let json = """
+		{
+			"date": "2023-12-17T04:56:02Z",
+		}
+		""".data(using: .utf8)!
+
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		let dictionary = try decoder.decode([String: AnyDecodable].self, from: json)
+
+		XCTAssertEqual(dictionary["date"]?.value as! Date, Date(timeIntervalSince1970: 1702788962))
+
+	}
 }

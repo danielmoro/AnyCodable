@@ -176,6 +176,10 @@ extension AnyEncodable: Equatable {
             return lhs == rhs
         case let (lhs as [AnyEncodable], rhs as [AnyEncodable]):
             return lhs == rhs
+		#if canImport(Foundation)
+		case let (lhs as Date, rhs as Date):
+			return lhs == rhs
+		#endif
         default:
             return false
         }
@@ -247,6 +251,12 @@ extension _AnyEncodable {
     public init(dictionaryLiteral elements: (AnyHashable, Any)...) {
         self.init([AnyHashable: Any](elements, uniquingKeysWith: { first, _ in first }))
     }
+
+	#if canImport(Foundation)
+	public init(dateLiteral value: Date) {
+		self.init(value)
+	}
+	#endif
 }
 
 extension AnyEncodable: Hashable {
@@ -284,6 +294,10 @@ extension AnyEncodable: Hashable {
             hasher.combine(value)
         case let value as [AnyEncodable]:
             hasher.combine(value)
+		#if canImport(Foundation)
+		case let value as Date:
+			hasher.combine(value)
+		#endif
         default:
             break
         }

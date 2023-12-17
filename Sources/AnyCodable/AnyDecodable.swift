@@ -51,6 +51,13 @@ extension _AnyDecodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
+		#if canImport(Foundation)
+		if let date = try? container.decode(Date.self) {
+			self.init(date)
+			return
+		}
+		#endif
+
         if container.decodeNil() {
             #if canImport(Foundation)
                 self.init(NSNull())
@@ -61,20 +68,23 @@ extension _AnyDecodable {
             self.init(bool)
         } else if let int = try? container.decode(Int.self) {
             self.init(int)
-        } else if let uint = try? container.decode(UInt.self) {
-            self.init(uint)
+		} else if let uint = try? container.decode(UInt.self) {
+			self.init(uint)
         } else if let double = try? container.decode(Double.self) {
             self.init(double)
         } else if let string = try? container.decode(String.self) {
             self.init(string)
         } else if let array = try? container.decode([AnyDecodable].self) {
             self.init(array.map { $0.value })
-        } else if let dictionary = try? container.decode([String: AnyDecodable].self) {
-            self.init(dictionary.mapValues { $0.value })
-        } else {
+		} else if let dictionary = try? container.decode([String: AnyDecodable].self) {
+			self.init(dictionary.mapValues { $0.value })
+		}
+		else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyDecodable value cannot be decoded")
         }
     }
+
+
 }
 
 extension AnyDecodable: Equatable {
@@ -116,6 +126,10 @@ extension AnyDecodable: Equatable {
             return lhs == rhs
         case let (lhs as [AnyDecodable], rhs as [AnyDecodable]):
             return lhs == rhs
+		#if canImport(Foundation)
+		case let (lhs as Date, rhs as Date):
+			return lhs == rhs
+		#endif
         default:
             return false
         }
@@ -181,6 +195,10 @@ extension AnyDecodable: Hashable {
             hasher.combine(value)
         case let value as [AnyDecodable]:
             hasher.combine(value)
+		#if canImport(Foundation)
+		case let value as Date:
+			hasher.combine(value)
+		#endif
         default:
             break
         }

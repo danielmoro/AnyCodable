@@ -1,5 +1,8 @@
 @testable import AnyCodable
 import XCTest
+#if canImport(Foundation)
+import Foundation
+#endif
 
 class AnyEncodableTests: XCTestCase {
     
@@ -151,4 +154,26 @@ class AnyEncodableTests: XCTestCase {
 
         XCTAssertEqual(encodedJSONObject, expectedJSONObject)
     }
+
+	func testJSONDateEncoding() throws {
+
+		let dictionary: [String: AnyEncodable] = [
+			"date": AnyEncodable(Date(timeIntervalSince1970: 1702788962))
+		]
+
+		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = .iso8601
+
+		let json = try encoder.encode(dictionary)
+		let encodedJSONObject = try JSONSerialization.jsonObject(with: json, options: []) as! NSDictionary
+
+		let expected = """
+		{
+			"date": "2023-12-17T04:56:02Z",
+		}
+		""".data(using: .utf8)!
+		let expectedJSONObject = try JSONSerialization.jsonObject(with: expected, options: []) as! NSDictionary
+
+		XCTAssertEqual(encodedJSONObject, expectedJSONObject)
+	}
 }

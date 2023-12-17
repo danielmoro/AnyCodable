@@ -48,14 +48,18 @@ protocol _AnyDecodable {
 extension AnyDecodable: _AnyDecodable {}
 
 extension _AnyDecodable {
+
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
 		#if canImport(Foundation)
-		if let date = try? container.decode(Date.self) {
-			self.init(date)
-			return
-		}
+        if let keyedContainer = try? decoder.container(keyedBy: DateKey.self) {
+            if let date = try? keyedContainer.decodeIfPresent(Date.self, forKey: .date) {
+                self.init(date)
+                return
+            }
+        }
 		#endif
 
         if container.decodeNil() {

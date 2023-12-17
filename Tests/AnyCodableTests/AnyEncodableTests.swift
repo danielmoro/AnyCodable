@@ -155,7 +155,7 @@ class AnyEncodableTests: XCTestCase {
         XCTAssertEqual(encodedJSONObject, expectedJSONObject)
     }
 
-	func testJSONDateEncoding() throws {
+	func testJSONISODateEncoding() throws {
 
 		let dictionary: [String: AnyEncodable] = [
 			"date": AnyEncodable(Date(timeIntervalSince1970: 1702788962))
@@ -168,12 +168,38 @@ class AnyEncodableTests: XCTestCase {
 		let encodedJSONObject = try JSONSerialization.jsonObject(with: json, options: []) as! NSDictionary
 
 		let expected = """
-		{
-			"date": "2023-12-17T04:56:02Z",
-		}
-		""".data(using: .utf8)!
+        {
+            "date": {
+                "$value": "2023-12-17T04:56:02Z"
+            }
+        }
+        """.data(using: .utf8)!
 		let expectedJSONObject = try JSONSerialization.jsonObject(with: expected, options: []) as! NSDictionary
 
 		XCTAssertEqual(encodedJSONObject, expectedJSONObject)
 	}
+
+    func testJSONMS1970DateEncoding() throws {
+
+        let dictionary: [String: AnyEncodable] = [
+            "date": AnyEncodable(Date(timeIntervalSince1970: 1702788962))
+        ]
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+
+        let json = try encoder.encode(dictionary)
+        let encodedJSONObject = try JSONSerialization.jsonObject(with: json, options: []) as! NSDictionary
+
+        let expected = """
+        {
+            "date": {
+                "$value": 1702788962000
+            }
+        }
+        """.data(using: .utf8)!
+        let expectedJSONObject = try JSONSerialization.jsonObject(with: expected, options: []) as! NSDictionary
+
+        XCTAssertEqual(encodedJSONObject, expectedJSONObject)
+    }
 }

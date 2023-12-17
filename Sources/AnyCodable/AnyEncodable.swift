@@ -55,6 +55,9 @@ extension _AnyEncodable {
         #if canImport(Foundation)
         case is NSNull:
             try container.encodeNil()
+        case let date as Date:
+            var keyedContainer = encoder.container(keyedBy: DateKey.self)
+            try keyedContainer.encode(date, forKey: .date)
         #endif
         case is Void:
             try container.encodeNil()
@@ -89,8 +92,6 @@ extension _AnyEncodable {
         #if canImport(Foundation)
         case let number as NSNumber:
             try encode(nsnumber: number, into: &container)
-        case let date as Date:
-            try container.encode(date)
         case let url as URL:
             try container.encode(url)
         #endif

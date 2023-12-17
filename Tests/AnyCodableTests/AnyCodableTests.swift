@@ -33,12 +33,13 @@ class AnyCodableTests: XCTestCase {
                 "c": "charlie"
             },
             "null": null,
-            "date": "2023-12-17T04:56:02Z"
+            "date": {
+                "$value": 724481762
+            }
         }
         """.data(using: .utf8)!
 
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
 
         let dictionary = try decoder.decode([String: AnyCodable].self, from: json)
 
@@ -66,7 +67,9 @@ class AnyCodableTests: XCTestCase {
                 "c": "charlie"
             },
             "null": null,
-            "date": "2023-12-17T04:56:02Z"
+            "date": {
+                "$value": 724481762
+            }
         }
         """.data(using: .utf8)!
         
@@ -108,7 +111,6 @@ class AnyCodableTests: XCTestCase {
         ]
 
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
 
         let json = try encoder.encode(dictionary)
         let encodedJSONObject = try JSONSerialization.jsonObject(with: json, options: []) as! NSDictionary
@@ -133,7 +135,9 @@ class AnyCodableTests: XCTestCase {
                 "has_underscore":"another string"
             },
             "null": null,
-            "date": "2023-12-17T04:56:02Z"
+            "date": {
+                "$value": 724481762
+            }
         }
         """.data(using: .utf8)!
         let expectedJSONObject = try JSONSerialization.jsonObject(with: expected, options: []) as! NSDictionary

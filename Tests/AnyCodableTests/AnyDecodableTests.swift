@@ -33,13 +33,11 @@ class AnyDecodableTests: XCTestCase {
     }
 
 	func testJSONISODateDecoding() throws {
-        let json = """
-        {
-            "date": {
-                "$value": "2023-12-17T04:56:02Z"
-            }
-        }
-        """.data(using: .utf8)!
+		let json = """
+		{
+			"date": "2023-12-17T04:56:02Z",
+		}
+		""".data(using: .utf8)!
 
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .iso8601
@@ -48,21 +46,4 @@ class AnyDecodableTests: XCTestCase {
 		XCTAssertEqual(dictionary["date"]?.value as! Date, Date(timeIntervalSince1970: 1702788962))
 
 	}
-
-    func testJSONMS1970DateDecoding() throws {
-        let json = """
-        {
-            "date": {
-                "$value": 1702788962000
-            }
-        }
-        """.data(using: .utf8)!
-
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .millisecondsSince1970
-        let dictionary = try decoder.decode([String: AnyDecodable].self, from: json)
-
-        XCTAssertEqual(dictionary["date"]?.value as! Date, Date(timeIntervalSince1970: 1702788962))
-
-    }
 }

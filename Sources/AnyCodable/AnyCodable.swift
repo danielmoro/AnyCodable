@@ -20,10 +20,6 @@ import Foundation
     }
 }
 
-enum DateKey: String, CodingKey {
-    case date = "$value"
-}
-
 extension AnyCodable: _AnyEncodable, _AnyDecodable {}
 
 extension AnyCodable: Equatable {
